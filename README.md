@@ -15,11 +15,11 @@ You can access the app via the following URL:
 ## Screenshots
 
 ### Application Interface
-(![Field Tech Survery 1](https://github.com/user-attachments/assets/804f9cb1-809e-4990-a954-a01304be99b9)
+![Field Tech Survery 1](https://github.com/user-attachments/assets/804f9cb1-809e-4990-a954-a01304be99b9)
 
 
 ### Generated PDF Example
-(![Field Tech Survey 2](https://github.com/user-attachments/assets/b0c83953-d2ae-433c-b9e0-6ee898a09494)
+![Field Tech Survey 2](https://github.com/user-attachments/assets/b0c83953-d2ae-433c-b9e0-6ee898a09494)
 
 
 ## Technologies Used
