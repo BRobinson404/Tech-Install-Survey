@@ -440,7 +440,10 @@ function renumberDevices() {
         addMultilineLabelAndValue("Follow-Up Items Needed", textareas[4]?.value);
         addMultilineLabelAndValue("Action Plan for Follow-Up", textareas[5]?.value);
 
-        doc.save(`${customerName}_TIS.pdf`);
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+        doc.save(`${customerName}_${dateStr}_TIS.pdf`);
       });
     });
 
