@@ -15,10 +15,12 @@ You can access the app via the following URL:
 ## Screenshots
 
 ### Application Interface
-![App Screenshot](path/to/screenshot.png)
+![App Screenshot](![Field Tech Survery 1](https://github.com/user-attachments/assets/804f9cb1-809e-4990-a954-a01304be99b9)
+)
 
 ### Generated PDF Example
-![PDF Screenshot](path/to/pdf-example.png)
+![PDF Screenshot](![Field Tech Survey 2](https://github.com/user-attachments/assets/b0c83953-d2ae-433c-b9e0-6ee898a09494)
+)
 
 ## Technologies Used
 - HTML5
