@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technician Install Survey</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h1, h2 {
+      background-color: #004aad;
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 1.2rem;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="number"], input[type="email"], textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+    }
+    .checkbox-group input {
+      margin-right: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #004aad;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #faxSettings {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Field Technician Survey</h1>
+  <div id="survey">
+
+    <h2>Customer Info</h2>
+    <label>Customer Name:</label>
+    <input type="text" id="customerName">
+
+    <label>Location Contact:</label>
+    <input type="text">
+
+    <label>MOEbiz Sales Rep:</label>
+    <input type="text">
+
+    <label>MOEbiz Install Technician</label>
+    <input type="text">
+
+    <div id="devicesContainer">
+      <div class="device-entry">
+        <h2>Device 1: Equipment Details</h2>
+        <label>Equipment ID (EQ#):</label>
+        <input type="text" name="eq[]">
+
+        <label>Make/Model:</label>
+        <input type="text" name="model[]">
+
+        <label>Functions Desired:</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="functions_0[]" value="Print">Print</label>
+          <label><input type="checkbox" name="functions_0[]" value="Copy">Copy</label>
+          <label><input type="checkbox" name="functions_0[]" value="Scan">Scan</label>
+          <label><input type="checkbox" name="functions_0[]" value="Fax">Fax</label>
+        </div>
+
+        <h2>Device 1: Network Information</h2>
+        <label>IP Address:</label>
+        <input type="text" name="ip[]">
+
+        <label>Subnet Mask:</label>
+        <input type="text" name="subnet[]">
+
+        <label>Gateway:</label>
+        <input type="text" name="gateway[]">
+
+        <label>DNS 1:</label>
+        <input type="text" name="dns1[]">
+
+        <label>DNS 2:</label>
+        <input type="text" name="dns2[]">
+
+        <label>Domain Name:</label>
+        <input type="text" name="domain[]">
+
+        <button type="button" class="removeDeviceBtn" style="display:none; margin-top: 10px; background-color: crimson;">Remove This Device</button>
+        <hr />
+      </div>
+    </div>
+    <button type="button" id="addDeviceBtn" onclick="addDeviceBtn()">+ Add Another Device</button>
+
+    <h2>IT & Workstation Setup</h2>
+    <label>Number of Workstations:</label>
+    <input type="number">
+
+    <label>Operating Systems:</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="os" value="Windows 11">Windows 11</label>
+      <label><input type="checkbox" name="os" value="Windows 10">Windows 10</label>
+      <label><input type="checkbox" name="os" value="macOS">macOS</label>
+      <label><input type="checkbox" name="os" value="Other">Other</label>
+    </div>
+
+    <label>Where Drivers Were Installed:</label>
+    <input type="text">
+
+    <label>Were User Codes Loaded?</label>
+    <select>
+      <option>Yes</option>
+      <option>No</option>
+    </select>
+
+    <label>IT Provider Name:</label>
+    <input type="text">
+
+    <label>IT Provider Contact Info:</label>
+    <input type="text">
+
+    <h2>Installation Details</h2>
+    <label>Power Verified for Device:</label>
+    <select>
+      <option>Yes</option>
+      <option>No</option>
+    </select>
+
+    <label>Networking Method:</label>
+    <select>
+      <option>Wired</option>
+      <option>Wireless</option>
+      <option>USB</option>
+      <option>Stand-Alone</option>
+    </select>
+
+    <label>Address Book Migrated?</label>
+    <select>
+      <option>Yes</option>
+      <option>No</option>
+      <option>N/A</option>
+    </select>
+
+    <label>Workstation with KPAX Installed:</label>
+    <input type="text">
+
+    <h2>Scan & Print Setup</h2>
+    <label>Scan-to-Email Settings:</label>
+    <textarea></textarea>
+
+    <label>Scan-to-Folder Settings:</label>
+    <textarea></textarea>
+
+    <label>Default Print Settings:</label>
+    <textarea></textarea>
+
+    <h2>Fax Setup</h2>
+    <label>Fax Option Installed:</label>
+    <select id="faxInstalled" onchange="toggleFaxSettings()">
+      <option>Yes</option>
+      <option>No</option>
+    </select>
+
+    <div id="faxSettings">
+      <label>Fax Type:</label>
+      <select>
+        <option>Analog</option>
+        <option>VoIP</option>
+      </select>
+
+      <label>Fax Number:</label>
+      <input type="text">
+
+      <label>Fax Confirmation Reports Enabled?</label>
+      <select>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+
+      <label>Fax Forwarding Enabled?</label>
+      <select>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
+
+    <h2>Site Access</h2>
+    <label>Were Stairs Used for Access?</label>
+    <select>
+      <option>Yes</option>
+      <option>No</option>
+    </select>
+
+    <label>Location Notes:</label>
+    <textarea></textarea>
+
+    <h2>Additional Info</h2>
+
+    <label>Follow-Up Items Needed:</label>
+    <textarea></textarea>
+
+    <label>Action Plan for Follow-Up:</label>
+    <textarea></textarea>
+
+  </div>
+  <button id="savePdfBtn">Save as PDF</button>
+
+
+  <script>
+      function toggleFaxSettings() {
+        const faxInstalled = document.getElementById("faxInstalled").value;
+        const faxSettings = document.getElementById("faxSettings");
+        faxSettings.style.display = faxInstalled === "Yes" ? "block" : "none";
+      }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const saveBtn = document.getElementById("savePdfBtn");
+        saveBtn.addEventListener("click", () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "pt", format: "letter" });
+        const pageHeight = doc.internal.pageSize.height;
+        let y = 40;
+
+        const survey = document.getElementById("survey");
+        const customerNameInput = document.getElementById("customerName");
+        const customerName = customerNameInput?.value.trim() || "UnknownCustomer";
+
+
+        function checkPageSpace(lineHeight = 20) {
+        if (y + lineHeight > pageHeight - 40) {
+          doc.addPage();
+          y = 40;
+        }
+      }
+
+        function addSectionHeader(text) {
+          checkPageSpace(40);
+          doc.setFillColor(230, 230, 250);
+          doc.rect(40, y - 14, 520, 20, 'F');
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
+          doc.text(text, 45, y);
+          y += 10;
+          doc.setDrawColor(150);
+          doc.setLineWidth(0.5);
+          doc.line(40, y, 550, y);
+          y += 10;
+        }
+
+        function addLabelAndValue(label, value) {
+          const labelText = `${label}:`;
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          doc.text(labelText, 45, y);
+
+          const labelWidth = doc.getTextWidth(labelText);
+          const valueX = 45 + labelWidth + 10; // 10pt padding after label
+
+          doc.setFont("helvetica", "normal");
+          doc.text(value || "-", valueX, y);
+          y += 20;
+        }
+
+        function addMultilineLabelAndValue(label, value) {
+          const labelText = `${label}:`;
+          const lines = doc.splitTextToSize(value || "-", 350);
+
+          checkPageSpace(lines.length * 12 + 20);
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          doc.text(labelText, 45, y);
+
+          const labelWidth = doc.getTextWidth(labelText);
+          const valueX = 45 + labelWidth + 10; // 10pt padding after label
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          doc.text(lines, valueX, y);
+          y += lines.length * 12 + 4;
+        }
+
+        function getInputVal(selector) {
+          return document.querySelector(selector)?.value || "";
+        }
+
+        function getCheckedVals(name) {
+          return Array.from(document.querySelectorAll(`input[name='${name}']:checked`)).map(cb => cb.value).join(", ");
+        }
+
+        const addDeviceBtn = document.getElementById("addDeviceBtn");
+      const devicesContainer = document.getElementById("devicesContainer");
+
+addDeviceBtn.addEventListener("click", () => {
+  const existingDevices = devicesContainer.querySelectorAll(".device-entry");
+  const newIndex = existingDevices.length;
+
+  const lastDevice = existingDevices[existingDevices.length - 1];
+  const newDevice = lastDevice.cloneNode(true);
+
+  // Update header text
+  newDevice.querySelectorAll("h2")[0].textContent = `Device ${newIndex + 1}: Equipment Details`;
+  newDevice.querySelectorAll("h2")[1].textContent = `Device ${newIndex + 1}: Network Information`;
+
+  // Clear all input values
+  newDevice.querySelectorAll("input").forEach(input => {
+    if (input.type === "checkbox") {
+      input.checked = false;
+    } else {
+      input.value = "";
+    }
+  });
+
+  // Update checkbox name attributes for unique groupings
+  const checkboxes = newDevice.querySelectorAll("input[type='checkbox']");
+  checkboxes.forEach(cb => {
+    cb.name = `functions_${newIndex}[]`;
+  });
+
+  // Show the remove button
+  const removeBtn = newDevice.querySelector(".removeDeviceBtn");
+  removeBtn.style.display = "inline-block";
+  removeBtn.onclick = function () {
+    newDevice.remove();
+    renumberDevices();
+  };
+
+  devicesContainer.appendChild(newDevice);
+  renumberDevices();
+});
+
+function renumberDevices() {
+  const allDevices = devicesContainer.querySelectorAll(".device-entry");
+  allDevices.forEach((device, i) => {
+    device.querySelectorAll("h2")[0].textContent = `Device ${i + 1}: Equipment Details`;
+    device.querySelectorAll("h2")[1].textContent = `Device ${i + 1}: Network Information`;
+
+    const checkboxes = device.querySelectorAll("input[type='checkbox']");
+    checkboxes.forEach(cb => {
+      cb.name = `functions_${i}[]`;
+    });
+
+    const removeBtn = device.querySelector(".removeDeviceBtn");
+    removeBtn.style.display = allDevices.length > 1 ? "inline-block" : "none";
+  });
+}
+
+
+        // Customer Info
+        addSectionHeader("Customer Info");
+        addLabelAndValue("Customer Name", getInputVal("#customerName"));
+        addLabelAndValue("Location Contact", document.querySelectorAll("#survey input")[1]?.value);
+        addLabelAndValue("MOEbiz Sales Rep", document.querySelectorAll("#survey input")[2]?.value);
+        addLabelAndValue("MOEbiz Install Technician", document.querySelectorAll("#survey input")[3]?.value);
+
+        // Devices
+        const deviceEntries = document.querySelectorAll(".device-entry");
+        deviceEntries.forEach((entry, i) => {
+          addSectionHeader(`Device ${i + 1}: Equipment Details`);
+          addLabelAndValue("Equipment ID (EQ#)", entry.querySelector('input[name="eq[]"]')?.value);
+          addLabelAndValue("Make/Model", entry.querySelector('input[name="model[]"]')?.value);
+          const functions = Array.from(entry.querySelectorAll(`input[name="functions_${i}[]"]:checked`)).map(cb => cb.value).join(", ");
+          addLabelAndValue("Functions Desired", functions);
+
+          addSectionHeader(`Device ${i + 1}: Network Information`);
+          addLabelAndValue("IP Address", entry.querySelector('input[name="ip[]"]')?.value);
+          addLabelAndValue("Subnet Mask", entry.querySelector('input[name="subnet[]"]')?.value);
+          addLabelAndValue("Gateway", entry.querySelector('input[name="gateway[]"]')?.value);
+          addLabelAndValue("DNS 1", entry.querySelector('input[name="dns1[]"]')?.value);
+          addLabelAndValue("DNS 2", entry.querySelector('input[name="dns2[]"]')?.value);
+          addLabelAndValue("Domain Name", entry.querySelector('input[name="domain[]"]')?.value);
+        });
+
+        // IT & Workstation Setup
+        addSectionHeader("IT & Workstation Setup");
+        addLabelAndValue("Number of Workstations", document.querySelector("input[type='number']")?.value);
+        addLabelAndValue("Operating Systems", getCheckedVals("os"));
+        addLabelAndValue("Where Drivers Were Installed", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 4]?.value);
+        addLabelAndValue("Were User Codes Loaded?", document.querySelectorAll("select")[0]?.value);
+        addLabelAndValue("IT Provider Name", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 5]?.value);
+        addLabelAndValue("IT Provider Contact Info", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 6]?.value);
+
+        // Installation Details
+        addSectionHeader("Installation Details");
+        addLabelAndValue("Power Verified for Device", document.querySelectorAll("select")[1]?.value);
+        addLabelAndValue("Networking Method", document.querySelectorAll("select")[2]?.value);
+        addLabelAndValue("Address Book Migrated?", document.querySelectorAll("select")[3]?.value);
+        addLabelAndValue("Workstation with KPAX Installed", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 7]?.value);
+
+        // Scan & Print Setup
+        addSectionHeader("Scan & Print Setup");
+        const textareas = document.querySelectorAll("textarea");
+        addMultilineLabelAndValue("Scan-to-Email Settings", textareas[0]?.value);
+        addMultilineLabelAndValue("Scan-to-Folder Settings", textareas[1]?.value);
+        addLabelAndValue("Default Print Settings", textareas[2]?.value);
+
+        // Fax Setup
+        addSectionHeader("Fax Setup");
+        addLabelAndValue("Fax Option Installed", document.getElementById("faxInstalled")?.value);
+        const faxFields = document.querySelectorAll("#faxSettings select, #faxSettings input");
+        addLabelAndValue("Fax Type", faxFields[0]?.value);
+        addLabelAndValue("Fax Number", faxFields[1]?.value);
+        addLabelAndValue("Fax Confirmation Reports Enabled?", faxFields[2]?.value);
+        addLabelAndValue("Fax Forwarding Enabled?", faxFields[3]?.value);
+
+        // Site Access
+        addSectionHeader("Site Access");
+        addLabelAndValue("Were Stairs Used for Access?", document.querySelectorAll("select")[4]?.value);
+        addLabelAndValue("Location Notes", textareas[3]?.value);
+
+        // Additional Info
+        addSectionHeader("Additional Info");
+        addMultilineLabelAndValue("Follow-Up Items Needed", textareas[4]?.value);
+        addMultilineLabelAndValue("Action Plan for Follow-Up", textareas[5]?.value);
+
+        doc.save(`${customerName}_TIS.pdf`);
+      });
+    });
+
+    const addDeviceBtn = document.getElementById("addDeviceBtn");
+    const devicesContainer = document.getElementById("devicesContainer");
+
+    addDeviceBtn.addEventListener("click", () => {
+      const existingDevices = devicesContainer.querySelectorAll(".device-entry");
+      const newIndex = existingDevices.length;
+
+      const lastDevice = existingDevices[existingDevices.length - 1];
+      const newDevice = lastDevice.cloneNode(true);
+
+      // Update header text
+      newDevice.querySelectorAll("h2")[0].textContent = `Device ${newIndex + 1}: Equipment Details`;
+      newDevice.querySelectorAll("h2")[1].textContent = `Device ${newIndex + 1}: Network Information`;
+
+      // Clear all input values
+      newDevice.querySelectorAll("input").forEach(input => {
+        if (input.type === "checkbox") {
+          input.checked = false;
+        } else {
+          input.value = "";
+        }
+      });
+
+      // Update checkbox name attributes for unique groupings
+      const checkboxes = newDevice.querySelectorAll("input[type='checkbox']");
+      checkboxes.forEach(cb => {
+        cb.name = `functions_${newIndex}[]`;
+      });
+
+      // Show the remove button
+      const removeBtn = newDevice.querySelector(".removeDeviceBtn");
+      removeBtn.style.display = "inline-block";
+      removeBtn.onclick = function () {
+        newDevice.remove();
+        renumberDevices();
+      };
+
+      devicesContainer.appendChild(newDevice);
+      renumberDevices();
+    });
+
+    function renumberDevices() {
+      const allDevices = devicesContainer.querySelectorAll(".device-entry");
+      allDevices.forEach((device, i) => {
+        device.querySelectorAll("h2")[0].textContent = `Device ${i + 1}: Equipment Details`;
+        device.querySelectorAll("h2")[1].textContent = `Device ${i + 1}: Network Information`;
+
+        const checkboxes = device.querySelectorAll("input[type='checkbox']");
+        checkboxes.forEach(cb => {
+          cb.name = `functions_${i}[]`;
+        });
+
+        const removeBtn = device.querySelector(".removeDeviceBtn");
+        removeBtn.style.display = allDevices.length > 1 ? "inline-block" : "none";
+      });
+    }
+
+  </script>
+</body>
+</html>
