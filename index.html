@@ -240,72 +240,77 @@
         faxSettings.style.display = faxInstalled === "Yes" ? "block" : "none";
       }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const saveBtn = document.getElementById("savePdfBtn");
-        saveBtn.addEventListener("click", () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: "pt", format: "letter" });
-        const pageHeight = doc.internal.pageSize.height;
-        let y = 40;
+      document.addEventListener("DOMContentLoaded", () => {
+    const saveBtn = document.getElementById("savePdfBtn");
+    saveBtn.addEventListener("click", () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "pt", format: "letter" });
+      const pageHeight = doc.internal.pageSize.height;
+      const marginX = 40;
+      const maxTextWidth = 500;
+      const lineHeight = 14;
+      let y = 40;
 
-        const survey = document.getElementById("survey");
-        const customerNameInput = document.getElementById("customerName");
-        const customerName = customerNameInput?.value.trim() || "UnknownCustomer";
+      const customerName = document.getElementById("customerName")?.value.trim() || "UnknownCustomer";
 
-
-        function checkPageSpace(lineHeight = 20) {
-        if (y + lineHeight > pageHeight - 40) {
+      function checkPageSpace(lines = 1, buffer = 0) {
+        const estimatedHeight = lines * lineHeight + buffer;
+        if (y + estimatedHeight > pageHeight - 40) {
           doc.addPage();
           y = 40;
         }
       }
 
-        function addSectionHeader(text) {
-          checkPageSpace(40);
-          doc.setFillColor(230, 230, 250);
-          doc.rect(40, y - 14, 520, 20, 'F');
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(14);
-          doc.text(text, 45, y);
-          y += 10;
-          doc.setDrawColor(150);
-          doc.setLineWidth(0.5);
-          doc.line(40, y, 550, y);
-          y += 10;
-        }
+      function addSectionHeader(text) {
+        y += 10;
+        checkPageSpace(2, 20);
+        doc.setFillColor(230, 230, 250);
+        doc.rect(marginX, y - 14, 520, 20, 'F');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text(text, marginX + 5, y);
+        y += 10;
+        doc.setDrawColor(150);
+        doc.setLineWidth(0.5);
+        doc.line(marginX, y, marginX + 510, y);
+        y += 10;
+      }
 
-        function addLabelAndValue(label, value) {
-          const labelText = `${label}:`;
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text(labelText, 45, y);
+      function addLabelAndValue(label, value) {
+        const labelText = `${label}:`;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        const labelWidth = doc.getTextWidth(labelText);
+        const valueX = marginX + labelWidth + 10;
 
-          const labelWidth = doc.getTextWidth(labelText);
-          const valueX = 45 + labelWidth + 10; // 10pt padding after label
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const wrappedText = doc.splitTextToSize(value || "-", maxTextWidth - labelWidth - 10);
+        checkPageSpace(wrappedText.length);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text(labelText, marginX, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(wrappedText, valueX, y);
 
-          doc.setFont("helvetica", "normal");
-          doc.text(value || "-", valueX, y);
-          y += 20;
-        }
+        y += wrappedText.length * lineHeight;
+      }
 
-        function addMultilineLabelAndValue(label, value) {
-          const labelText = `${label}:`;
-          const lines = doc.splitTextToSize(value || "-", 350);
+      function addMultilineLabelAndValue(label, value) {
+        const labelText = `${label}:`;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        checkPageSpace(1);
+        doc.text(labelText, marginX, y);
+        y += lineHeight;
 
-          checkPageSpace(lines.length * 12 + 20);
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text(labelText, 45, y);
-
-          const labelWidth = doc.getTextWidth(labelText);
-          const valueX = 45 + labelWidth + 10; // 10pt padding after label
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
-          doc.text(lines, valueX, y);
-          y += lines.length * 12 + 4;
-        }
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const wrappedText = doc.splitTextToSize(value || "-", maxTextWidth);
+        checkPageSpace(wrappedText.length);
+        doc.text(wrappedText, marginX, y);
+        y += wrappedText.length * lineHeight;
+      }
 
         function getInputVal(selector) {
           return document.querySelector(selector)?.value || "";
