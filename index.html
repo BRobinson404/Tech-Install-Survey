@@ -132,7 +132,7 @@
     </div>
 
     <label>Where Drivers Were Installed:</label>
-    <input type="text">
+    <input type="text" id="driverLocation">
 
     <label>Were User Codes Loaded?</label>
     <select>
@@ -141,10 +141,10 @@
     </select>
 
     <label>IT Provider Name:</label>
-    <input type="text">
+    <input type="text" id="itProvider">
 
     <label>IT Provider Contact Info:</label>
-    <input type="text">
+    <input type="text" id="itContact">
 
     <h2>Installation Details</h2>
     <label>Power Verified for Device:</label>
@@ -234,17 +234,25 @@
 
 
   <script>
+      // Toggles visibility of fax settings section based on dropdown selection
       function toggleFaxSettings() {
         const faxInstalled = document.getElementById("faxInstalled").value;
         const faxSettings = document.getElementById("faxSettings");
+
+         // Show fax settings if "Yes" is selected, hide otherwise
         faxSettings.style.display = faxInstalled === "Yes" ? "block" : "none";
       }
 
+      // Runs after the page has fully loaded
       document.addEventListener("DOMContentLoaded", () => {
     const saveBtn = document.getElementById("savePdfBtn");
+
+    // Trigger PDF generation on button click
     saveBtn.addEventListener("click", () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: "pt", format: "letter" });
+      
+      // Page layout constants
       const pageHeight = doc.internal.pageSize.height;
       const marginX = 40;
       const maxTextWidth = 500;
@@ -253,34 +261,37 @@
 
       const customerName = document.getElementById("customerName")?.value.trim() || "UnknownCustomer";
 
+      // Checks if there’s enough vertical space left on the page; adds a new page if not
       function checkPageSpace(lines = 1, buffer = 0) {
         const estimatedHeight = lines * lineHeight + buffer;
         if (y + estimatedHeight > pageHeight - 40) {
           doc.addPage();
-          y = 40;
+          y = 40; // Reset Y on new page
         }
       }
 
+      // Adds a colored section header with a bottom line (like a chapter title)
       function addSectionHeader(text) {
         y += 10;
         checkPageSpace(2, 20);
-        doc.setFillColor(230, 230, 250);
-        doc.rect(marginX, y - 14, 520, 20, 'F');
+        doc.setFillColor(230, 230, 250); // Light lavender fill
+        doc.rect(marginX, y - 14, 520, 20, 'F'); // Background box
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
-        doc.text(text, marginX + 5, y);
+        doc.text(text, marginX + 5, y); // Header text
         y += 10;
         doc.setDrawColor(150);
         doc.setLineWidth(0.5);
-        doc.line(marginX, y, marginX + 510, y);
+        doc.line(marginX, y, marginX + 510, y); // Bottom divider line
         y += 10;
       }
 
+      // Adds a single-line label and wrapped value (e.g., "Model: MX-4071")
       function addLabelAndValue(label, value) {
         const labelText = `${label}:`;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
-        const labelWidth = doc.getTextWidth(labelText);
+        const labelWidth = doc.getTextWidth(labelText); // Needed for aligning the value
         const valueX = marginX + labelWidth + 10;
 
         doc.setFont("helvetica", "normal");
@@ -293,9 +304,10 @@
         doc.setFont("helvetica", "normal");
         doc.text(wrappedText, valueX, y);
 
-        y += wrappedText.length * lineHeight;
+        y += wrappedText.length * lineHeight; // Move down based on text height
       }
 
+      // Same as the addLabelAndValue, but create multiline value below it
       function addMultilineLabelAndValue(label, value) {
         const labelText = `${label}:`;
         doc.setFont("helvetica", "bold");
@@ -312,23 +324,26 @@
         y += wrappedText.length * lineHeight;
       }
 
+        // Returns value of an input field given its selector
         function getInputVal(selector) {
           return document.querySelector(selector)?.value || "";
         }
 
+        // Returns comma-separated values of all checked checkboxes with a given name
         function getCheckedVals(name) {
           return Array.from(document.querySelectorAll(`input[name='${name}']:checked`)).map(cb => cb.value).join(", ");
         }
 
-        const addDeviceBtn = document.getElementById("addDeviceBtn");
+      // Logic for adding a new cloned device section dynamically
+      const addDeviceBtn = document.getElementById("addDeviceBtn");
       const devicesContainer = document.getElementById("devicesContainer");
 
-addDeviceBtn.addEventListener("click", () => {
-  const existingDevices = devicesContainer.querySelectorAll(".device-entry");
-  const newIndex = existingDevices.length;
+      addDeviceBtn.addEventListener("click", () => {
+        const existingDevices = devicesContainer.querySelectorAll(".device-entry");
+        const newIndex = existingDevices.length;
 
-  const lastDevice = existingDevices[existingDevices.length - 1];
-  const newDevice = lastDevice.cloneNode(true);
+        const lastDevice = existingDevices[existingDevices.length - 1];
+        const newDevice = lastDevice.cloneNode(true);
 
   // Update header text
   newDevice.querySelectorAll("h2")[0].textContent = `Device ${newIndex + 1}: Equipment Details`;
@@ -407,10 +422,10 @@ function renumberDevices() {
         addSectionHeader("IT & Workstation Setup");
         addLabelAndValue("Number of Workstations", document.querySelector("input[type='number']")?.value);
         addLabelAndValue("Operating Systems", getCheckedVals("os"));
-        addLabelAndValue("Where Drivers Were Installed", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 4]?.value);
+        addLabelAndValue("Where Drivers Were Installed", document.getElementById("driverLocation")?.value);
         addLabelAndValue("Were User Codes Loaded?", document.querySelectorAll("select")[0]?.value);
-        addLabelAndValue("IT Provider Name", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 5]?.value);
-        addLabelAndValue("IT Provider Contact Info", document.querySelectorAll("#survey input")[deviceEntries.length * 9 + 6]?.value);
+        addLabelAndValue("IT Provider Name", document.getElementById("itProvider")?.value);
+        addLabelAndValue("IT Provider Contact Info", document.getElementById("itContact")?.value);
 
         // Installation Details
         addSectionHeader("Installation Details");
